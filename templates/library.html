@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Library - Available Books{% endblock %}
+
+{% block content %}
+<h1>School Library Catalog</h1>
+<p class="subtitle">Physical borrowing and returns are managed directly at the library desk.</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publication Year</th>
+            <th>ISBN</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td><strong>{{ book.title }}</strong></td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.pub_year }}</td>
+            <td><code>{{ book.ISBN }}</code></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

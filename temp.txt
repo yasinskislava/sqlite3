@@ -1,0 +1,1 @@
+python -c "import sqlite3; con = sqlite3.connect('school.db'); print('\n'.join(con.iterdump()))" > schema.sql

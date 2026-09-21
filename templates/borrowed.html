@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}My Borrowed Books{% endblock %}
+
+{% block content %}
+<h1>My Borrowed Books</h1>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Book Title</th>
+            <th>Author</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Return Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td><strong>{{ record.title }}</strong></td>
+            <td>{{ record.author }}</td>
+            <td>{{ record.borrow_date }}</td>
+            <td>{{ record.due_date }}</td>
+            <td>{{ record.return_date if record.return_date else 'Not Returned' }}</td>
+            <td>
+                <span class="status-badge {{ record.status|lower }}">
+                    {{ record.status }}
+                </span>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

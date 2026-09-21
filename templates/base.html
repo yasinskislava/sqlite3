@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="{{ url_for('home') }}">School Portal</a>
+        </div>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('library') }}">Library</a>
+
+            {% if current_user.role in ['teacher', 'admin'] %}
+                <a href="{{ url_for('students') }}">Students</a>
+            {% endif %}
+
+            {% if current_user.role in ['student', 'teacher'] %}
+                <a href="{{ url_for('borrowed') }}">My Borrowed Books</a>
+            {% endif %}
+        </nav>
+        <div class="user-nav">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('account') }}" class="btn-account">Account ({{ current_user.first_name }})</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}        
+    </main>
+
+    <footer>
+        <p>&copy; 2026 School App. All rights reserved.</p>
+    </footer>
+</body>
+</html>

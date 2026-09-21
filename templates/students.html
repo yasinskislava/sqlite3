@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Student Directory{% endblock %}
+
+{% block content %}
+<h1>Student Directory</h1>
+<p class="subtitle">Confidential record access for teachers and administrators.</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Parent Contact</th>
+            <th>Enrolled Courses</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td><strong>{{ student.first_name }} {{ student.last_name }}</strong></td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.mobile }}</td>
+            <td>{{ student.parent_name }} ({{ student.parent_mobile }})</td>
+            <td>{{ student.courses|join(', ') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

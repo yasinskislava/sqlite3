@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Home - School Portal{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Welcome to St. Jude School Portal</h1>
+    <p>Connecting students, teachers, and parents in one place.</p>
+</section>
+
+<section class="dashboard-grid">
+    <article class="card">
+        <h2>School Announcements</h2>
+        <ul class="announcement-list">
+            <li><strong>Term 1 Exams:</strong> Timetables have been published in student accounts.</li>
+            <li><strong>Library Notice:</strong> New science and literature titles added this week!</li>
+            <li><strong>Parent-Teacher Evening:</strong> Scheduled for Thursday, October 15th.</li>
+        </ul>
+    </article>
+
+    <article class="card">
+        <h2>Quick Info</h2>
+        <p><strong>Term Dates:</strong> Sept 1 - Dec 18</p>
+        <p><strong>Library Hours:</strong> 08:00 - 16:30 (Mon-Fri)</p>
+    </article>
+</section>
+{% endblock %}
