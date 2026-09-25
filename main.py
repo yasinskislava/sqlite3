@@ -87,10 +87,42 @@ def logout():
 
 @app.route("/library")
 def library():
+    query = request.args.get("q", "").strip()
+    sort_by = request.args.get("sort", "title").lower()
+    direction = request.args.get("direction", "asc").lower()
+
+    valid_sort_fields = {
+        "title": "title",
+        "author": "author",
+        "publication_year": "pub_year",
+        "isbn": "ISBN"
+    }
+    
+    selected_sort = valid_sort_fields.get(sort_by, "title")
+    order_dir = "DESC" if direction == "desc" else "ASC"
+
     conn = get_db_connection()
-    books = conn.execute("SELECT * FROM Books").fetchall()
+    
+    sql = "SELECT * FROM Books"
+    params = []
+
+    if query:
+        sql += " WHERE title LIKE ? OR author LIKE ? OR ISBN LIKE ? OR pub_year LIKE ?"
+        search_pattern = f"%{query}%"
+        params.extend([search_pattern, search_pattern, search_pattern, search_pattern])
+
+    sql += f" ORDER BY {selected_sort} {order_dir}"
+
+    books = conn.execute(sql, params).fetchall()
     conn.close()
-    return render_template("library.html", books=books)
+
+    return render_template(
+        "library.html",
+        books=books,
+        query=query,
+        sort_by=sort_by,
+        direction=direction
+    )
 
 
 @app.route("/account")

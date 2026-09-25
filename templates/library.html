@@ -3,27 +3,139 @@
 {% block title %}Library - Available Books{% endblock %}
 
 {% block content %}
+
 <h1>School Library Catalog</h1>
 <p class="subtitle">Physical borrowing and returns are managed directly at the library desk.</p>
 
-<table class="data-table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Publication Year</th>
-            <th>ISBN</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for book in books %}
-        <tr>
-            <td><strong>{{ book.title }}</strong></td>
-            <td>{{ book.author }}</td>
-            <td>{{ book.pub_year }}</td>
-            <td><code>{{ book.ISBN }}</code></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div id="library-container">
+    <form id="search-form" action="{{ url_for('library') }}" style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Search by Title, Author, or ISBN..." 
+            style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;"
+        >
+
+        <input type="hidden" name="sort" value="{{ sort_by }}">
+        <input type="hidden" name="direction" value="{{ direction }}">
+
+        <button type="submit" style="padding: 8px 16px; cursor: pointer;">Search</button>
+        {% if query %}
+            <a href="{{ url_for('library') }}" class="ajax-link" style="align-self: center; text-decoration: none; color: #666;">Clear Search</a>
+        {% endif %}
+    </form>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>
+                    <a href="{{ url_for('library', q=query, sort='title', direction='desc' if sort_by == 'title' and direction == 'asc' else 'asc') }}" class="ajax-link">
+                        <span>Title</span>
+                        <span class="arrow-stack">
+                            <span class="{{ 'active' if sort_by == 'title' and direction == 'asc' else 'inactive' }}">▲</span>
+                            <span class="{{ 'active' if sort_by == 'title' and direction == 'desc' else 'inactive' }}">▼</span>
+                        </span>
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ url_for('library', q=query, sort='author', direction='desc' if sort_by == 'author' and direction == 'asc' else 'asc') }}" class="ajax-link">
+                        <span>Author</span>
+                        <span class="arrow-stack">
+                            <span class="{{ 'active' if sort_by == 'author' and direction == 'asc' else 'inactive' }}">▲</span>
+                            <span class="{{ 'active' if sort_by == 'author' and direction == 'desc' else 'inactive' }}">▼</span>
+                        </span>
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ url_for('library', q=query, sort='publication_year', direction='desc' if sort_by == 'publication_year' and direction == 'asc' else 'asc') }}" class="ajax-link">
+                        <span>Publication Year</span>
+                        <span class="arrow-stack">
+                            <span class="{{ 'active' if sort_by == 'publication_year' and direction == 'asc' else 'inactive' }}">▲</span>
+                            <span class="{{ 'active' if sort_by == 'publication_year' and direction == 'desc' else 'inactive' }}">▼</span>
+                        </span>
+                    </a>
+                </th>
+
+                <th>
+                    <a href="{{ url_for('library', q=query, sort='isbn', direction='desc' if sort_by == 'isbn' and direction == 'asc' else 'asc') }}" class="ajax-link">
+                        <span>ISBN</span>
+                        <span class="arrow-stack">
+                            <span class="{{ 'active' if sort_by == 'isbn' and direction == 'asc' else 'inactive' }}">▲</span>
+                            <span class="{{ 'active' if sort_by == 'isbn' and direction == 'desc' else 'inactive' }}">▼</span>
+                        </span>
+                    </a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td><strong>{{ book.title }}</strong></td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.pub_year }}</td>
+                <td><code>{{ book.ISBN }}</code></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No books found matching your criteria.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadLibraryData(url) {
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContainer = doc.getElementById('library-container');
+            
+            if (newContainer) {
+                document.getElementById('library-container').innerHTML = newContainer.innerHTML;
+                window.history.pushState({}, '', url);
+            }
+        })
+        .catch(err => console.error('Error updating library data:', err));
+    }
+
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a.ajax-link');
+        if (link) {
+            e.preventDefault();
+            loadLibraryData(link.href);
+        }
+    });
+
+    document.addEventListener('submit', function(e) {
+        if (e.target && e.target.id === 'search-form') {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData).toString();
+            const url = `${e.target.action}?${params}`;
+            loadLibraryData(url);
+        }
+    });
+
+    window.addEventListener('popstate', function() {
+        fetch(location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const newContainer = doc.getElementById('library-container');
+                if (newContainer) {
+                    document.getElementById('library-container').innerHTML = newContainer.innerHTML;
+                }
+            });
+    });
+</script>
 {% endblock %}
